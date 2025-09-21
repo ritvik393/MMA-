@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MMA Official App</title>
+<style>
+:root{
+  --bg:#0c1a2a; /* page bg */
+  --card:#0f2238; /* card bg */
+  --text:#e6f0ff; /* primary text */
+  --muted:#9cb6d1; /* secondary text */
+  --brand:#11b7ff; /* brand cyan */
+  --brand-2:#6be7ff; /* brand light */
+  --danger:#ff5d6c; /* red */
+  --ok:#2ecc71; /* green */
+  --chip:#152a44; /* chip bg */
+  --chip-text:#bcd0ea;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+  color:var(--text);
+  background: radial-gradient(1200px 600px at 30% -10%, #0c2b4c 5%, transparent 60%),
+              radial-gradient(800px 400px at 90% 0%, #0a2240 5%, transparent 55%),
+              var(--bg);
+  min-height:100vh;
+}
+.container{ max-width:1100px; margin:42px auto; padding:0 16px; }
+.card{
+  background: linear-gradient(180deg, rgba(18,37,62,.75), rgba(12,31,53,.75));
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+  padding:22px;
+}
+h1,h2,h3{margin:0 0 10px}
+.muted{color:var(--muted)}
+.row{display:flex; gap:10px; flex-wrap:wrap}
+.nav{display:flex; gap:8px; margin:12px 0 6px}
+.btn{
+  background:#162e4d;
+  color:var(--text);
+  border:1px solid rgba(255,255,255,.08);
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:.2s;
+  font-weight:600;
+  font-size:14px;
+}
+.btn:hover{transform: translateY(-1px); border-color:rgba(17,183,255,.5)}
+.btn.brand{background:linear-gradient(90deg, var(--brand), var(--brand-2)); color:#031622; border:none}
+.btn.danger{background:linear-gradient(90deg, #ff6b6b, #ff7e8b); color:#2b0b12; border:none}
+.btn.ok{background:linear-gradient(90deg, #2ecc71, #6be78f); color:#062212; border:none}
+.badge{display:inline-block; padding:4px 10px; border-radius:999px; background:var(--chip); color:var(--chip-text); font-size:12px}
+.grid{display:grid; gap:14px}
+.grid-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.hidden{display:none !important}
+input, textarea, select{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);
+  background:#0e2137;
+  color:var(--text);
+  outline:none;
+}
+label{font-size:13px; color:var(--muted)}
+.sectionTitle{margin:18px 0 8px; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}
+.list{background:#0f2238; border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space:pre-wrap}
+.center{display:flex; align-items:center; justify-content:center; min-height:60vh}
+.login-card{width:100%; max-width:520px}
+.success{color:var(--ok)}
+.danger-text{color:var(--danger)}
+.hr{height:1px; background:rgba(255,255,255,.06); margin:12px 0}
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.titleRow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.kicker{font-size:13px; color:var(--muted)}
+.quickRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+.notice{font-size:13px; color:var(--muted)}
+.small{font-size:12px}
+.highlight{color:gold}
+@media (max-width:760px){ .grid-2{grid-template-columns: 1fr} }
+/* small helpers */
+.meta-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.e-card{display:flex; gap:14px; align-items:flex-start}
+.e-card img{width:96px; height:96px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,.08)}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- LOGIN VIEW -->
+  <div id="view-login" class="center">
+    <div class="card login-card">
+      <h2 style="margin-bottom:4px;">Login</h2>
+      <div class="kicker">Username और Password भरो (case-insensitive)।</div>
+      <div class="hr"></div>
+      <div class="grid">
+        <div>
+          <label>Username</label>
+          <input id="login-username" placeholder="e.g. Ritvik kem" autocomplete="username" />
+        </div>
+        <div>
+          <label>Password</label>
+          <input id="login-password" type="password" placeholder="••••••" autocomplete="current-password" />
+        </div>
+        <div class="row" style="justify-content:flex-end; margin-top:6px">
+          <button class="btn brand" id="btn-login">Login</button>
+        </div>
+        <div id="login-error" class="danger-text hidden">Invalid login!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP VIEW -->
+  <div id="view-app" class="hidden">
+    <div class="card">
+      <div class="topbar">
+        <div>
+          <div class="titleRow">
+            <h2 id="welcome-title">Welcome</h2>
+          </div>
+          <div class="success" id="congrats-line">🎉 Congratulations, Welcome!</div>
+          <div class="kicker" style="margin-top:6px;">Rank:
+            <span id="rank-chip" class="badge">-</span>
+            <span id="premium-chip" class="badge hidden" style="margin-left:8px; background:linear-gradient(90deg,#ffd966,#ffb347); color:#2b1500">PREMIUM</span>
+          </div>
+          <div class="kicker" style="margin-top:6px;">Today: <span id="today"></span></div>
+        </div>
+        <div class="nav">
+          <button class="btn" data-tab="home">Home</button>
+          <button class="btn" data-tab="attendance">Attendance</button>
+          <button class="btn" data-tab="complaint">Complaint</button>
+          <button class="btn" data-tab="vote">Vote</button>
+          <button class="btn" data-tab="balance">Balance</button>
+          <button class="btn" data-tab="records">My Records</button>
+          <button class="btn" data-tab="ecard">User Card</button>
+          <button class="btn hidden" id="btn-admin" data-tab="admin">Admin Panel</button>
+          <button class="btn" id="btn-logout">Logout</button>
+        </div>
+      </div>
+      <div class="hr"></div>
+
+      <!-- HOME TAB -->
+      <div id="tab-home">
+        <h3>Quick Actions</h3>
+        <div class="quickRow">
+          <button class="btn ok" id="btn-mark-att">Mark Attendance</button>
+          <button class="btn brand" id="btn-open-complaint">Open Complaint Box</button>
+        </div>
+        <div class="notice" style="margin-top:10px">
+          Attendance और Complaint इस web version में <b>localStorage</b> में सुरक्षित रहती हैं। Server लगने पर Firestore add कर सकते हैं।
+        </div>
+      </div>
+
+      <!-- ATTENDANCE TAB -->
+      <div id="tab-attendance" class="hidden">
+        <h3>Attendance</h3>
+        <div class="row" style="margin:10px 0">
+          <button class="btn ok" id="btn-mark-att-2">Mark Attendance (Today)</button>
+        </div>
+        <div class="sectionTitle">My Attendance</div>
+        <div class="list" id="att-list">No records</div>
+
+        <div class="sectionTitle" style="margin-top:12px">All Attendance (ZOD/ADMIN/GOD view)</div>
+        <div class="list" id="all-att-list">Only visible to Admin ranks</div>
+      </div>
+
+      <!-- COMPLAINT TAB -->
+      <div id="tab-complaint" class="hidden">
+        <h3>Complaint Box</h3>
+        <div class="grid">
+          <div>
+            <label>Write Complaint</label>
+            <textarea id="complaint-text" rows="4" placeholder="Type here..."></textarea>
+          </div>
+          <div class="row" style="justify-content:flex-end">
+            <button class="btn brand" id="btn-save-complaint">Submit Complaint</button>
+          </div>
+        </div>
+
+        <div class="sectionTitle">My Complaints</div>
+        <div class="list" id="complaint-list">No complaints</div>
+
+        <div class="sectionTitle" style="margin-top:12px">All Complaints (ZOD/ADMIN/GOD view)</div>
+        <div class="list" id="all-compl-list">Only visible to Admin ranks</div>
+      </div>
+
+      <!-- VOTE TAB -->
+      <div id="tab-vote" class="hidden">
+        <h3>Vote</h3>
+        <div class="grid grid-2">
+          <div>
+            <label>Add a vote option</label>
+            <input id="vote-new-option" placeholder="e.g. Best Player" />
+            <div class="row" style="justify-content:flex-end">
+              <button class="btn" id="btn-add-vote">Add Option</button>
+            </div>
+          </div>
+          <div>
+            <label>Cast Vote</label>
+            <select id="vote-select"></select>
+            <div class="row" style="justify-content:flex-end; margin-top:8px">
+              <button class="btn ok" id="btn-cast-vote">Vote</button>
+            </div>
+          </div>
+        </div>
+        <div class="sectionTitle" style="margin-top:12px">My Vote (last)</div>
+        <div class="list" id="my-vote">No vote</div>
+
+        <div class="sectionTitle" style="margin-top:12px">Vote Results (ZOD/ADMIN/GOD view)</div>
+        <div class="list" id="vote-results">Only visible to Admin ranks</div>
+      </div>
+
+      <!-- BALANCE TAB -->
+      <div id="tab-balance" class="hidden">
+        <h3>Balance / Money</h3>
+        <div class="grid grid-2">
+          <div>
+            <label>Send Money (Admin ranks only)</label>
+            <input id="send-user" placeholder="Username (exact)" />
+            <input id="send-amount" placeholder="Amount (number)" />
+            <div class="row" style="justify-content:flex-end; margin-top:6px">
+              <button class="btn brand" id="btn-send-money">Send</button>
+            </div>
+          </div>
+          <div>
+            <label>Your Balance</label>
+            <div class="list" id="my-balance">-</div>
+          </div>
+        </div>
+
+        <div class="sectionTitle" style="margin-top:12px">Balances / Leaderboard</div>
+        <div class="list" id="balances-list">-</div>
+      </div>
+
+      <!-- RECORDS TAB -->
+      <div id="tab-records" class="hidden">
+        <h3>My Records</h3>
+        <div class="grid grid-2">
+          <div>
+            <div class="sectionTitle">Attendance</div>
+            <div class="list" id="rec-att">-</div>
+          </div>
+          <div>
+            <div class="sectionTitle">Complaints</div>
+            <div class="list" id="rec-comp">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER CARD (E-CARD) TAB -->
+      <div id="tab-ecard" class="hidden">
+        <h3>User Card (E-Card)</h3>
+        <div class="e-card">
+          <img id="ecard-photo-preview" src="" alt="Photo" />
+          <div class="grid grid-2" style="flex:1">
+            <div>
+              <label>Full Name</label>
+              <input id="ecard-name" placeholder="Your full name"/>
+            </div>
+            <div>
+              <label>Role / Title</label>
+              <input id="ecard-role" placeholder="e.g. Player / Coach"/>
+            </div>
+            <div>
+              <label>Phone</label>
+              <input id="ecard-phone" placeholder="e.g. 9876543210"/>
+            </div>
+            <div>
+              <label>Blood Group</label>
+              <input id="ecard-blood" placeholder="e.g. O+"/>
+            </div>
+            <div class="grid" style="grid-column:1 / -1">
+              <label>Address</label>
+              <input id="ecard-address" placeholder="City, State"/>
+            </div>
+            <div class="grid" style="grid-column:1 / -1">
+              <label>Photo</label>
+              <input id="ecard-photo" type="file" accept="image/*"/>
+            </div>
+            <div class="row" style="justify-content:flex-end; grid-column:1 / -1">
+              <button class="btn brand" id="btn-save-ecard">Save My Card</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sectionTitle">Admin Edit (ZOD/GOD/ADMIN)</div>
+        <div class="grid grid-2">
+          <div>
+            <label>Username (exact)</label>
+            <input id="ecard-admin-username" placeholder="e.g. bhavya solanki"/>
+          </div>
+          <div class="row" style="justify-content:flex-end; align-items:end">
+            <button class="btn" id="btn-load-ecard">Load Card</button>
+            <button class="btn ok" id="btn-save-ecard-admin">Save For User</button>
+          </div>
+        </div>
+        <div class="small muted">Note: Photo भी edit कर सकते हैं — ऊपर वाले inputs/Photo uploader का use करें।</div>
+      </div>
+
+      <!-- ADMIN TAB (GOD + ZOD + ADMIN) -->
+      <div id="tab-admin" class="hidden">
+        <h3>Admin Panel (GOD + ZOD + ADMIN)</h3>
+
+        <div class="sectionTitle">WhatsApp Group</div>
+        <div class="grid grid-2">
+          <div>
+            <label>Group Link</label>
+            <input id="wa-link" placeholder="https://chat.whatsapp.com/..." />
+          </div>
+          <div class="row" style="justify-content:flex-end; align-items:end">
+            <button class="btn" id="btn-save-wa">Save Link</button>
+            <a id="wa-open" class="btn brand" href="#" target="_blank">Open Group</a>
+          </div>
+          <div style="grid-column:1 / -1">
+            <label>Group Filter Keywords (comma-separated)</label>
+            <input id="wa-filters" placeholder="e.g. spam, abuse, off-topic" />
+          </div>
+          <div style="grid-column:1 / -1">
+            <div class="row" style="justify-content:flex-end; align-items:end">
+              <button class="btn" id="btn-save-filters">Save Filters</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sectionTitle">Simulate Group Message (auto 1-day ban on match)</div>
+        <div class="grid grid-2">
+          <div>
+            <label>Username (exact)</label>
+            <input id="wa-msg-user" placeholder="e.g. bhavya solanki" />
+          </div>
+          <div>
+            <label>Message Text</label>
+            <input id="wa-msg-text" placeholder="Type a message to test filter..." />
+          </div>
+          <div class="row" style="justify-content:flex-end; grid-column:1 / -1">
+            <button class="btn danger" id="btn-sim-wa-msg">Simulate & Check</button>
+          </div>
+        </div>
+
+        <div class="sectionTitle">All Attendance + Complaints (raw)</div>
+        <div class="list" id="admin-raw">-</div>
+
+        <div class="sectionTitle">Ban / Temp Ban Users</div>
+        <div class="grid grid-2">
+          <div>
+            <label>Username (exact)</label>
+            <input id="ban-username" placeholder="e.g. Bhavya solanki" />
+          </div>
+          <div class="grid">
+            <div class="row">
+              <div style="flex:1">
+                <label>Temp Ban (duration)</label>
+                <input id="ban-duration" placeholder="e.g. 30m / 2h / 3d (optional)" />
+              </div>
+            </div>
+            <div class="row" style="justify-content:flex-end">
+              <button class="btn danger" id="btn-ban">Ban User</button>
+              <button class="btn danger" id="btn-tempban">Temp Ban</button>
+              <button class="btn ok" id="btn-unban">Unban</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sectionTitle">Current Bans</div>
+        <div class="list" id="bans-list">None</div>
+
+        <div class="sectionTitle">Grant Rank (ZOD only)</div>
+        <div class="grid grid-2">
+          <div>
+            <label>Username</label>
+            <input id="rank-user" placeholder="e.g. Simrit solanki" />
+          </div>
+          <div>
+            <label>Rank</label>
+            <select id="rank-value">
+              <option value="HEAD">HEAD</option>
+              <option value="GOD">GOD</option>
+              <option value="ZOD">ZOD</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="GOLDEN">GOLDEN</option>
+            </select>
+          </div>
+          <div class="row" style="justify-content:flex-end">
+            <button class="btn brand" id="btn-grant-rank">Grant Rank</button>
+          </div>
+        </div>
+
+        <!-- Change Password (ZOD only) -->
+        <div class="sectionTitle">Change Password (ZOD only)</div>
+        <div class="grid grid-2">
+          <div>
+            <label>Username (exact)</label>
+            <input id="pwd-username" placeholder="e.g. Vrinda solanki" />
+          </div>
+          <div>
+            <label>New Password</label>
+            <input id="pwd-new" type="password" placeholder="Enter new password" />
+          </div>
+          <div>
+            <label>Confirm Password</label>
+            <input id="pwd-confirm" type="password" placeholder="Re-enter new password" />
+          </div>
+          <div class="row" style="justify-content:flex-end; align-items:end">
+            <button class="btn brand" id="btn-change-pass">Change Password</button>
+          </div>
+        </div>
+
+        <div class="sectionTitle">Make Premium / Revoke</div>
+        <div class="grid grid-2">
+          <div>
+            <label>Username (exact)</label>
+            <input id="premium-username" placeholder="e.g. Bhavya solanki" />
+          </div>
+          <div class="row" style="justify-content:flex-end; align-items:end">
+            <button class="btn" id="btn-make-premium">Make Premium</button>
+            <button class="btn" id="btn-revoke-premium">Revoke Premium</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================== SETTINGS =========================== */
+const FORCE_LOGOUT_ON_REFRESH = false;
+
+/* =========================== INITIAL USERS (base) =========================== */
+const BASE_USERS = {
+  "bhavya solanki": { name: "Bhavya solanki", pass: "1111111", rank: "GOLDEN" },
+  "vrinda solanki": { name: "Vrinda solanki", pass: "8888888", rank: "GOLDEN" },
+  "ritvik kem": { name: "Ritvik kem", pass: "20250179751", rank: "ZOD" },
+  "Trishab ": { name:"Trishab", pass: "1111", rank: "GOLDEN" },
+};
+
+/* =========================== STORAGE KEYS & DATA =========================== */
+const LS = { SESSION: "mma_session_v1", DATA: "mma_data_v3" }; // v3 after new features
+
+function defaultData(){
+  const usersMeta = {};
+  for(const k of Object.keys(BASE_USERS)){
+    usersMeta[k] = { pass: BASE_USERS[k].pass, rank: BASE_USERS[k].rank, premium: false, balance: 0 };
+  }
+  const zodKey = "ritvik kem";
+  if(usersMeta[zodKey]) usersMeta[zodKey].balance = "INF";
+  return {
+    users: usersMeta,            // pass/rank/premium/balance
+    attendance: {},              // usernameLower -> [dates]
+    complaints: {},              // usernameLower -> [{text, at}]
+    bans: {},                    // usernameLower -> {permanent:true} or {until:ts}
+    voteOptions: ["Best Player","Best Fighter","Best Attitude"],
+    votes: {},                   // option -> totalWeight
+    userVotes: {},               // usernameLower -> {option, at, weight}
+    eCards: {},                  // usernameLower -> {name, role, phone, blood, address, photoDataUrl}
+    waLink: "",                  // WhatsApp group link
+    waFilters: []                // banned keywords (lowercase)
+  };
+}
+function loadData(){
+  const raw = localStorage.getItem(LS.DATA);
+  if(!raw){ const base = defaultData(); localStorage.setItem(LS.DATA, JSON.stringify(base)); return base; }
+  try{ return JSON.parse(raw); }
+  catch(e){ localStorage.removeItem(LS.DATA); const base = defaultData(); localStorage.setItem(LS.DATA, JSON.stringify(base)); return base; }
+}
+function saveData(d){ localStorage.setItem(LS.DATA, JSON.stringify(d)); }
+let DATA = loadData();
+
+/* =========================== HELPERS =========================== */
+const $ = sel => document.querySelector(sel);
+const todayStr = () => new Date().toISOString().slice(0,10);
+$("#today").textContent = todayStr();
+function normalizeUser(u){ return (u||"").trim().toLowerCase(); }
+function getUserObj(key){
+  const k = normalizeUser(key);
+  if(!k) return null;
+  const base = BASE_USERS[k] ? {...BASE_USERS[k]} : { name: key, pass: "", rank: "Member" };
+  const meta = DATA.users[k] || {};
+  return {
+    key: k,
+    name: base.name || meta.name || key,
+    pass: meta.pass !== undefined ? meta.pass : base.pass,
+    rank: meta.rank || base.rank || "Member",
+    premium: !!meta.premium,
+    balance: meta.balance !== undefined ? meta.balance : 0
+  };
+}
+function setUserMeta(key, patch){
+  const k = normalizeUser(key);
+  if(!DATA.users[k]) DATA.users[k] = { pass:"", rank:"Member", premium:false, balance:0 };
+  Object.assign(DATA.users[k], patch);
+  saveData(DATA);
+}
+function isAdminRank(rank){ return rank==="GOD" || rank==="ZOD" || rank==="ADMIN"; }
+
+/* SESSION */
+function getSession(){ const raw = localStorage.getItem(LS.SESSION); if(!raw) return null; try{ return JSON.parse(raw) }catch{return null} }
+function setSession(session){ if(session) localStorage.setItem(LS.SESSION, JSON.stringify(session)); else localStorage.removeItem(LS.SESSION); }
+
+/* =========================== AUTO BAN for missing attendance (1 day) =========================== */
+function getYesterdayStr(){
+  const d = new Date();
+  d.setDate(d.getDate()-1);
+  return d.toISOString().slice(0,10);
+}
+function checkAutoBanForMissedAttendance(userKey){
+  const y = getYesterdayStr();
+  const arr = DATA.attendance[userKey] || [];
+  if(!arr.includes(y)){
+    // if already temp-banned still valid, skip re-banning
+    const b = DATA.bans[userKey];
+    const alreadyActive = b && b.until && (Date.now() < b.until);
+    if(!alreadyActive){
+      DATA.bans[userKey] = { until: Date.now() + 24*60*60*1000 };
+      saveData(DATA);
+      refreshBansUI();
+      alert("Auto Temp Ban: Yesterday attendance missing. 1 day ban applied.");
+    }
+  }
+}
+
+/* =========================== LOGIN FLOW =========================== */
+$("#btn-login").addEventListener("click", handleLogin);
+function handleLogin(){
+  const u = normalizeUser($("#login-username").value);
+  const p = ($("#login-password").value||"").trim();
+  const user = getUserObj(u);
+  const err = $("#login-error");
+
+  if(!user || user.pass !== p){
+    err.classList.remove("hidden");
+    err.textContent = "Invalid login!";
+    return;
+  }
+  if(isUserBanned(u)){
+    err.classList.remove("hidden");
+    const b = DATA.bans[u];
+    if(b?.permanent) err.textContent = "This user is permanently banned.";
+    else if(b?.until){
+      const mins = Math.ceil((b.until - Date.now())/60000);
+      err.textContent = `Temporarily banned. Try again in ~${mins} min.`;
+    } else err.textContent = "Banned user.";
+    return;
+  }
+  err.classList.add("hidden");
+  setSession({ userKey: u, loggedAt: Date.now() });
+  // auto-ban check for previous day
+  checkAutoBanForMissedAttendance(u);
+  initAfterLogin();
+}
+function isUserBanned(userKey){
+  const b = DATA.bans[userKey];
+  if(!b) return false;
+  if(b.until){
+    if(Date.now()>b.until){
+      delete DATA.bans[userKey];
+      saveData(DATA);
+      return false;
+    }
+    return true;
+  }
+  return !!b.permanent;
+}
+function initAfterLogin(){
+  const session = getSession();
+  if(!session){ setView("view-login"); return; }
+  const user = getUserObj(session.userKey);
+  if(!user){ setSession(null); setView("view-login"); return; }
+
+  $("#welcome-title").textContent = `Welcome, ${user.name}`;
+  $("#rank-chip").textContent = user.rank;
+  $("#congrats-line").textContent = `🎉 Congratulations, Welcome ${user.name}!`;
+  if(user.premium) $("#premium-chip").classList.remove("hidden"); else $("#premium-chip").classList.add("hidden");
+  $("#btn-admin").classList.toggle("hidden", !isAdminRank(user.rank));
+  refreshAllUI();
+  setView("tab-home");
+}
+
+/* LOGOUT */
+$("#btn-logout").addEventListener("click", ()=>{ setSession(null); setView("view-login"); });
+if(FORCE_LOGOUT_ON_REFRESH){ setSession(null); }
+window.addEventListener("DOMContentLoaded", ()=>{
+  const s = getSession();
+  if(s) initAfterLogin(); else setView("view-login");
+});
+
+/* NAV TABS */
+document.querySelectorAll('.nav .btn[data-tab]').forEach(b=>{
+  b.addEventListener("click", ()=> showTab(b.dataset.tab));
+});
+
+/* VIEW helpers */
+function setView(idToShow){
+  $("#view-login").classList.add("hidden");
+  $("#view-app").classList.add("hidden");
+  document.querySelectorAll('[id^="tab-"]').forEach(n=>n.classList.add("hidden"));
+  if(idToShow.startsWith("tab-")){
+    $("#view-app").classList.remove("hidden");
+    $("#"+idToShow).classList.remove("hidden");
+  }else{
+    $("#"+idToShow).classList.remove("hidden");
+  }
+}
+function showTab(name){
+  document.querySelectorAll('[id^="tab-"]').forEach(n=>n.classList.add("hidden"));
+  $("#tab-"+name).classList.remove("hidden");
+}
+
+/* =========================== ATTENDANCE =========================== */
+function markAttendance(){
+  const s = getSession(); if(!s) return;
+  const userKey = s.userKey;
+  const t = todayStr();
+  if(!DATA.attendance[userKey]) DATA.attendance[userKey] = [];
+  if(!DATA.attendance[userKey].includes(t)){
+    DATA.attendance[userKey].push(t);
+    saveData(DATA);
+  }
+  refreshAllUI();
+  alert("Attendance marked for today ✔️");
+}
+$("#btn-mark-att").addEventListener("click", markAttendance);
+$("#btn-mark-att-2").addEventListener("click", markAttendance);
+
+function refreshAttendanceList(){
+  const s = getSession(); if(!s) return;
+  const arr = (DATA.attendance[s.userKey]||[]).slice().sort();
+  $("#att-list").textContent = arr.length ? arr.join("\n") : "No records";
+}
+
+/* =========================== COMPLAINTS =========================== */
+$("#btn-open-complaint").addEventListener("click", ()=> showTab("complaint"));
+$("#btn-save-complaint").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const text = ($("#complaint-text").value||"").trim();
+  if(!text){ alert("Write something first!"); return; }
+  if(!DATA.complaints[s.userKey]) DATA.complaints[s.userKey] = [];
+  DATA.complaints[s.userKey].push({ text, at: new Date().toISOString() });
+  saveData(DATA);
+  $("#complaint-text").value = "";
+  refreshAllUI();
+  alert("Complaint submitted ✅");
+});
+function refreshComplaintsList(){
+  const s = getSession(); if(!s) return;
+  const arr = (DATA.complaints[s.userKey]||[]);
+  if(!arr.length){ $("#complaint-list").textContent = "No complaints"; return; }
+  $("#complaint-list").textContent = arr.map(c=>`• [${c.at.slice(0,16).replace('T',' ')}] ${c.text}`).join("\n");
+}
+
+/* =========================== VOTING =========================== */
+$("#btn-add-vote").addEventListener("click", ()=>{
+  const opt = ($("#vote-new-option").value||"").trim();
+  if(!opt) return alert("Enter option name");
+  if(DATA.voteOptions.includes(opt)) return alert("Option exists");
+  DATA.voteOptions.push(opt);
+  DATA.votes[opt] = 0;
+  saveData(DATA);
+  renderVoteOptions();
+  $("#vote-new-option").value = "";
+});
+function renderVoteOptions(){
+  const sel = $("#vote-select");
+  sel.innerHTML = "";
+  DATA.voteOptions.forEach(o=>{
+    const opt = document.createElement("option");
+    opt.value = o; opt.textContent = o; sel.appendChild(opt);
+    if(DATA.votes[o]===undefined) DATA.votes[o]=0;
+  });
+  renderVoteResults();
+}
+$("#btn-cast-vote").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return alert("Login first");
+  const ukey = s.userKey;
+  const choice = $("#vote-select").value;
+  if(!choice) return alert("Choose option");
+  const uobj = getUserObj(ukey);
+  const weight = uobj.premium ? 2 : 1;
+  DATA.votes[choice] = (DATA.votes[choice]||0) + weight;
+  DATA.userVotes[ukey] = { option: choice, at: new Date().toISOString(), weight };
+  saveData(DATA);
+  renderVoteResults();
+  $("#my-vote").textContent = `Last: ${choice} (weight ${weight})`;
+  alert("Vote cast ✅");
+});
+function renderVoteResults(){
+  const lines = DATA.voteOptions.map(o=> `${o}: ${ (DATA.votes[o]||0) }` );
+  $("#vote-results").textContent = lines.join("\n");
+}
+
+/* =========================== BALANCE / LEADERBOARD =========================== */
+$("#btn-send-money").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return alert("Login first");
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)) return alert("Only ZOD/GOD/ADMIN can send money from admin panel");
+  const to = normalizeUser($("#send-user").value);
+  const amt = parseInt($("#send-amount").value||"0",10);
+  if(!to || isNaN(amt) || amt<=0) return alert("Enter valid user and amount >0");
+  if(!DATA.users[to]) { DATA.users[to] = { pass:"", rank:"Member", premium:false, balance:0 }; }
+  if(DATA.users[to].balance === "INF"){ /* unchanged */ }
+  else { DATA.users[to].balance = (Number(DATA.users[to].balance)||0) + amt; }
+  saveData(DATA);
+  refreshAllUI();
+  const disp = BASE_USERS[to]?.name || to;
+  alert(`Sent ${amt} to ${disp}`);
+});
+function computeBalancesList(){
+  const map = {};
+  for(const k of Object.keys(BASE_USERS)){
+    const nm = BASE_USERS[k].name;
+    const meta = DATA.users[k] || {};
+    map[nm] = (meta.balance===undefined ? 0 : meta.balance);
+  }
+  for(const k of Object.keys(DATA.users)){
+    const name = (BASE_USERS[k]?.name) || k;
+    map[name] = DATA.users[k].balance === undefined ? 0 : DATA.users[k].balance;
+  }
+  return map;
+}
+function renderBalances(){
+  const map = computeBalancesList();
+  const rows = Object.entries(map).map(([n,b])=> `${n}: ${b==="INF" ? "∞" : b}` );
+  $("#balances-list").textContent = rows.join("\n");
+  const s = getSession();
+  if(s){
+    const meta = DATA.users[s.userKey] || {};
+    const b = meta.balance===undefined ? 0 : meta.balance;
+    $("#my-balance").textContent = (b==="INF" ? "∞" : b);
+  } else $("#my-balance").textContent = "-";
+}
+
+/* =========================== RECORDS / ADMIN UI =========================== */
+function refreshAdminRaw(){
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)) return;
+  const dump = {
+    users: Object.fromEntries(Object.entries(DATA.users).map(([k,v])=>[
+      (BASE_USERS[k]?.name||k),
+      { password:v.pass, rank:v.rank, premium:v.premium, balance:v.balance }
+    ])),
+    attendance: Object.fromEntries(Object.entries(DATA.attendance||{}).map(([k,v])=>[BASE_USERS[k]?.name||k, v])),
+    complaints: Object.fromEntries(Object.entries(DATA.complaints||{}).map(([k,v])=>[BASE_USERS[k]?.name||k, v])),
+    bans: DATA.bans,
+    votes: DATA.votes,
+    waLink: DATA.waLink,
+    waFilters: DATA.waFilters
+  };
+  $("#admin-raw").textContent = JSON.stringify(dump, null, 2);
+}
+function refreshAllUI(){
+  renderVoteOptions();
+  refreshAttendanceList();
+  refreshComplaintsList();
+  renderBalances();
+  renderVoteResults();
+  refreshAdminRaw();
+
+  // all attendance (Admin ranks)
+  $("#all-att-list").textContent =
+    Object.entries(DATA.attendance).map(([k,arr])=>{
+      const name = BASE_USERS[k]?.name || k;
+      return `${name}: ${arr.join(", ")}`;
+    }).join("\n") || "None";
+
+  // all complaints (Admin ranks)
+  $("#all-compl-list").textContent =
+    Object.entries(DATA.complaints).map(([k,arr])=>{
+      const name = BASE_USERS[k]?.name || k;
+      return arr.map(c=> `${name} — [${c.at.slice(0,16).replace('T',' ')}] ${c.text}`).join("\n");
+    }).join("\n\n") || "None";
+
+  // my records
+  const s = getSession();
+  if(s){
+    const atts = (DATA.attendance[s.userKey]||[]).slice().sort();
+    $("#rec-att").textContent = atts.length ? atts.join("\n") : "-";
+    const comps = (DATA.complaints[s.userKey]||[]);
+    $("#rec-comp").textContent = comps.length ? comps.map(c=>`[${c.at.slice(0,10)}] ${c.text}`).join("\n") : "-";
+    const userobj = getUserObj(s.userKey);
+    if(userobj.premium) $("#premium-chip").classList.remove("hidden"); else $("#premium-chip").classList.add("hidden");
+    $("#btn-admin").classList.toggle("hidden", !isAdminRank(userobj.rank));
+    loadMyEcardUI(); // refresh e-card UI
+  }
+
+  // admin WhatsApp UI
+  $("#wa-link").value = DATA.waLink || "";
+  const a = $("#wa-open");
+  if(DATA.waLink){ a.href = DATA.waLink; a.classList.remove("hidden"); } else { a.href="#"; }
+  $("#wa-filters").value = (DATA.waFilters||[]).join(", ");
+}
+
+/* =========================== BANS =========================== */
+function parseDurationToMs(s){
+  if(!s) return null;
+  const m = String(s).trim().toLowerCase().match(/^(\d+)\s*(m|h|d)$/);
+  if(!m) return null;
+  const n = parseInt(m[1],10);
+  const unit = m[2];
+  if(unit==="m") return n*60*1000;
+  if(unit==="h") return n*60*60*1000;
+  if(unit==="d") return n*24*60*60*1000;
+  return null;
+}
+function refreshBansUI(){
+  const lines = [];
+  const now = Date.now();
+  for(const [key,info] of Object.entries(DATA.bans||{})){
+    const name = BASE_USERS[key]?.name || key;
+    if(info.permanent) lines.push(`🚫 ${name} — PERMANENT`);
+    else if(info.until){
+      const leftMin = Math.max(0, Math.ceil((info.until-now)/60000));
+      const untilStr = new Date(info.until).toLocaleString();
+      lines.push(`⏳ ${name} — Temp until ${untilStr} (~${leftMin} min)`);
+    }
+  }
+  $("#bans-list").textContent = lines.length? lines.join("\n") : "None";
+}
+$("#btn-ban").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)){ alert("No admin rights."); return; }
+  const u = normalizeUser($("#ban-username").value);
+  if(!DATA.users[u]) return alert("User not found.");
+  DATA.bans[u] = { permanent:true };
+  saveData(DATA);
+  refreshBansUI(); refreshAllUI();
+  alert(`Banned ${BASE_USERS[u]?.name || u}`);
+});
+$("#btn-tempban").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)){ alert("No admin rights."); return; }
+  const u = normalizeUser($("#ban-username").value);
+  const dur = parseDurationToMs($("#ban-duration").value);
+  if(!DATA.users[u]) return alert("User not found.");
+  if(!dur) return alert("Use duration like 30m / 2h / 1d");
+  DATA.bans[u] = { until: Date.now()+dur };
+  saveData(DATA);
+  refreshBansUI(); refreshAllUI();
+  alert(`Temp banned ${BASE_USERS[u]?.name || u}`);
+});
+$("#btn-unban").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)){ alert("No admin rights."); return; }
+  const u = normalizeUser($("#ban-username").value);
+  if(!DATA.bans[u]) return alert("User is not banned.");
+  delete DATA.bans[u];
+  saveData(DATA);
+  refreshBansUI(); refreshAllUI();
+  alert(`Unbanned ${BASE_USERS[u]?.name || u}`);
+});
+
+/* =========================== RANK GRANT =========================== */
+$("#btn-grant-rank").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(me.rank!=="ZOD"){ alert("Only ZOD can grant rank."); return; }
+  const u = normalizeUser($("#rank-user").value);
+  const rv = $("#rank-value").value;
+  if(!DATA.users[u]) return alert("User not found.");
+  setUserMeta(u, { rank: rv });
+  if(u===s.userKey){
+    $("#rank-chip").textContent = rv;
+    $("#btn-admin").classList.toggle("hidden", !isAdminRank(rv));
+  }
+  refreshAllUI();
+  alert(`Granted rank ${rv} to ${BASE_USERS[u]?.name || u}`);
+});
+
+/* =========================== CHANGE PASSWORD (ZOD only) =========================== */
+$("#btn-change-pass").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(me.rank !== "ZOD"){ alert("Only ZOD can change passwords."); return; }
+  const uname = normalizeUser($("#pwd-username").value);
+  const np = ($("#pwd-new").value||"").trim();
+  const cp = ($("#pwd-confirm").value||"").trim();
+  if(!DATA.users[uname]) return alert("User not found.");
+  if(!np) return alert("Enter a new password.");
+  if(np !== cp) return alert("Passwords do not match.");
+  setUserMeta(uname, { pass: np });
+  $("#pwd-new").value = ""; $("#pwd-confirm").value = "";
+  refreshAllUI();
+  alert(`Password updated for ${BASE_USERS[uname]?.name || uname}`);
+});
+
+/* =========================== PREMIUM =========================== */
+$("#btn-make-premium").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(me.rank !== "ZOD"){ alert("Only ZOD can make premium."); return; }
+  const uname = normalizeUser($("#premium-username").value);
+  if(!DATA.users[uname]) return alert("User not found.");
+  setUserMeta(uname, { premium: true });
+  refreshAllUI();
+  alert(`${BASE_USERS[uname]?.name || uname} is now PREMIUM`);
+});
+$("#btn-revoke-premium").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(me.rank !== "ZOD"){ alert("Only ZOD can revoke premium."); return; }
+  const uname = normalizeUser($("#premium-username").value);
+  if(!DATA.users[uname]) return alert("User not found.");
+  setUserMeta(uname, { premium: false });
+  refreshAllUI();
+  alert(`${BASE_USERS[uname]?.name || uname} premium revoked`);
+});
+
+/* =========================== E-CARD (User Card) =========================== */
+function getEcard(key){
+  const k = normalizeUser(key);
+  if(!DATA.eCards[k]) DATA.eCards[k] = { name:"", role:"", phone:"", blood:"", address:"", photoDataUrl:"" };
+  return DATA.eCards[k];
+}
+function loadMyEcardUI(){
+  const s = getSession(); if(!s) return;
+  const card = getEcard(s.userKey);
+  $("#ecard-name").value = card.name || (BASE_USERS[s.userKey]?.name || "");
+  $("#ecard-role").value = card.role || "";
+  $("#ecard-phone").value = card.phone || "";
+  $("#ecard-blood").value = card.blood || "";
+  $("#ecard-address").value = card.address || "";
+  const img = $("#ecard-photo-preview");
+  img.src = card.photoDataUrl || "";
+  img.style.display = card.photoDataUrl ? "block" : "none";
+}
+$("#ecard-photo").addEventListener("change", function(){
+  const file = this.files?.[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const s = getSession(); if(!s) return;
+    const card = getEcard(s.userKey);
+    card.photoDataUrl = e.target.result;
+    saveData(DATA);
+    loadMyEcardUI();
+  };
+  reader.readAsDataURL(file);
+});
+$("#btn-save-ecard").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const card = getEcard(s.userKey);
+  card.name = $("#ecard-name").value;
+  card.role = $("#ecard-role").value;
+  card.phone = $("#ecard-phone").value;
+  card.blood = $("#ecard-blood").value;
+  card.address = $("#ecard-address").value;
+  saveData(DATA);
+  alert("Your E-Card saved ✅");
+});
+$("#btn-load-ecard").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)) return alert("Only ZOD/GOD/ADMIN can load others' cards.");
+  const uname = normalizeUser($("#ecard-admin-username").value);
+  if(!uname) return alert("Enter username");
+  const exists = DATA.users[uname];
+  if(!exists) return alert("User not found.");
+  // Load that user's card into UI fields (so admin can edit)
+  const c = getEcard(uname);
+  $("#ecard-name").value = c.name || (BASE_USERS[uname]?.name || "");
+  $("#ecard-role").value = c.role || "";
+  $("#ecard-phone").value = c.phone || "";
+  $("#ecard-blood").value = c.blood || "";
+  $("#ecard-address").value = c.address || "";
+  $("#ecard-photo-preview").src = c.photoDataUrl || "";
+  $("#ecard-photo-preview").style.display = c.photoDataUrl ? "block" : "none";
+  alert("Card loaded. Edit fields above and click 'Save For User'.");
+});
+$("#btn-save-ecard-admin").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)) return alert("Only ZOD/GOD/ADMIN can save others' cards.");
+  const uname = normalizeUser($("#ecard-admin-username").value);
+  if(!DATA.users[uname]) return alert("User not found.");
+  const c = getEcard(uname);
+  c.name = $("#ecard-name").value;
+  c.role = $("#ecard-role").value;
+  c.phone = $("#ecard-phone").value;
+  c.blood = $("#ecard-blood").value;
+  c.address = $("#ecard-address").value;
+  // Photo: if admin wants to change, they can ask user to upload or paste base64 externally.
+  saveData(DATA);
+  alert(`E-Card saved for ${BASE_USERS[uname]?.name || uname} ✅`);
+});
+
+/* =========================== WhatsApp Link + Filters =========================== */
+$("#btn-save-wa").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)) return alert("Admin ranks only.");
+  DATA.waLink = ($("#wa-link").value||"").trim();
+  saveData(DATA); refreshAllUI();
+  alert("WhatsApp link saved.");
+});
+$("#btn-save-filters").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)) return alert("Admin ranks only.");
+  const txt = ($("#wa-filters").value||"").toLowerCase();
+  DATA.waFilters = txt.split(",").map(x=>x.trim()).filter(Boolean);
+  saveData(DATA); refreshAllUI();
+  alert("Filters saved.");
+});
+$("#btn-sim-wa-msg").addEventListener("click", ()=>{
+  const s = getSession(); if(!s) return;
+  const me = getUserObj(s.userKey);
+  if(!isAdminRank(me.rank)) return alert("Admin ranks only.");
+  const uname = normalizeUser($("#wa-msg-user").value);
+  const msg = ($("#wa-msg-text").value||"").toLowerCase();
+  if(!DATA.users[uname]) return alert("User not found.");
+  const hit = (DATA.waFilters||[]).some(k=> k && msg.includes(k));
+  if(hit){
+    DATA.bans[uname] = { until: Date.now() + 24*60*60*1000 };
+    saveData(DATA); refreshBansUI(); refreshAllUI();
+    alert(`Auto 1-day ban applied to ${BASE_USERS[uname]?.name || uname} (filter match)`);
+  }else{
+    alert("No filter matched.");
+  }
+});
+
+/* =========================== BOOTSTRAP =========================== */
+(function bootstrapEnsure(){
+  // ensure vote keys present
+  DATA.voteOptions.forEach(o=>{ if(DATA.votes[o]===undefined) DATA.votes[o]=0; });
+
+  // ensure base users exist in DATA
+  for(const k of Object.keys(BASE_USERS)){
+    if(!DATA.users[k]) DATA.users[k] = { pass: BASE_USERS[k].pass, rank: BASE_USERS[k].rank, premium:false, balance: (k==="ritvik kem"?"INF":0) };
+  }
+  saveData(DATA);
+  renderVoteOptions();
+  refreshAllUI();
+  refreshBansUI();
+})();
+</script>
+</body>
+</html>
